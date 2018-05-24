@@ -1,0 +1,6 @@
+[
+  {
+    "runnableClass": "com.mf.AOSAndroidAppiumTest",
+    "framework": "junit"
+  }
+]
