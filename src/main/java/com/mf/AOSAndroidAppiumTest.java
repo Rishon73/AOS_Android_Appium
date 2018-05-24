@@ -1,3 +1,5 @@
+package com.mf;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +21,16 @@ public class AOSAndroidAppiumTest {
     @Before
     public void setup(){
         /* Global vars for setup */
-        String MC_SERVER = "<YOUR MOBILE SERVER ADDRESS AND PORT>";          // Your MC server
-        String MC_SERVER_USER = "<YOUR MC USER NAME>";     // Your MC user name
-        String MC_SERVER_PASSWORD = "<YOU MC PASSWORD>"; // Your MC password
+        String MC_SERVER = "http://demo.mobilecenter.io:8080";          // Your MC server
+        String MC_SERVER_USER = "shahar.shiff@hpe.com";     // Your MC user name
+        String MC_SERVER_PASSWORD = "Welc0me11"; // Your MC password
+        final String SRF_SERVER = System.getenv("SELENIUM_ADDRESS");
+        final String SRF_CLIENT_SECRET  = System.getenv("SRF_CLIENT_SECRET");
+        final String SRF_CLIENT_ID = System.getenv("SRF_CLIENT_ID");
 
         String APP_PACKAGE = "com.Advantage.aShopping";
         String APP_ACTIVITY = "com.Advantage.aShopping.SplashActivity";
+
 
         try {
             // Set Capabilities instance
@@ -33,20 +39,29 @@ public class AOSAndroidAppiumTest {
             // Set device capabilities
             capabilities.setCapability("platformName", "Android");
             //capabilities.setCapability("deviceName", "Nexus 7");
-            capabilities.setCapability("platformVersion", ">6.0.0");
+            //capabilities.setCapability("deviceName", "Pixel");
+            //capabilities.setCapability("platformVersion", ">6.0.0");
 
             // Application capabilities
             capabilities.setCapability("appPackage", APP_PACKAGE);
             capabilities.setCapability("appActivity", APP_ACTIVITY);
 
-            // Set MC Server credentials (could be skipped if "Anonymous access" is enabled for Appium scripts in the Administration settings).
-            capabilities.setCapability("userName", MC_SERVER_USER);
-            capabilities.setCapability("password", MC_SERVER_PASSWORD);
-            logMessages("================== " + MC_SERVER + "/wd/hub ==================", LOG_LEVEL.INFO);
 
-            // Create a session to the MC server
-            driver = new AndroidDriver(new URL(MC_SERVER + "/wd/hub"), capabilities);
+            if (SRF_SERVER != null) {
+                logMessages("================== " + SRF_SERVER + " ==================", LOG_LEVEL.INFO);
+                capabilities.setCapability("SRF_CLIENT_SECRET", SRF_CLIENT_SECRET);
+                capabilities.setCapability("SRF_CLIENT_ID", SRF_CLIENT_ID);
+                driver = new AndroidDriver(new URL(SRF_SERVER), capabilities);
+            } else {
+                // Set MC Server credentials (could be skipped if "Anonymous access" is enabled for Appium scripts in the Administration settings).
+                capabilities.setCapability("userName", MC_SERVER_USER);
+                capabilities.setCapability("password", MC_SERVER_PASSWORD);
 
+                logMessages("================== " + MC_SERVER + "/wd/hub ==================", LOG_LEVEL.INFO);
+
+                // Create a session to the MC server
+                driver = new AndroidDriver(new URL(MC_SERVER + "/wd/hub"), capabilities);
+            }
             // Create a wait object instance in order to verify expected conditions.
             WebDriverWait waitController = new WebDriverWait(driver, 60);
 
@@ -175,5 +190,5 @@ public class AOSAndroidAppiumTest {
         System.out.println(prefix + " [" + getTimeStamp("dd/MM/yyyy HH:mm:ss") + "] " + message);
     }
 
-    public void windowSync(long millseconds) throws InterruptedException { Thread.sleep(millseconds); }
+    public void windowSync(long milliseconds) throws InterruptedException { Thread.sleep(milliseconds); }
 }
