@@ -21,9 +21,9 @@ public class AOSAndroidAppiumTest {
     @Before
     public void setup(){
         /* Global vars for setup */
-        String MC_SERVER = "http://demo.mobilecenter.io:8080";          // Your MC server
-        String MC_SERVER_USER = "shahar.shiff@hpe.com";     // Your MC user name
-        String MC_SERVER_PASSWORD = "Welc0me11"; // Your MC password
+        String MC_SERVER = "";          // Your MC server
+        String MC_SERVER_USER = "";     // Your MC user name
+        String MC_SERVER_PASSWORD = ""; // Your MC password
         final String SRF_SERVER = System.getenv("SELENIUM_ADDRESS");
         final String SRF_CLIENT_SECRET  = System.getenv("SRF_CLIENT_SECRET");
         final String SRF_CLIENT_ID = System.getenv("SRF_CLIENT_ID");
