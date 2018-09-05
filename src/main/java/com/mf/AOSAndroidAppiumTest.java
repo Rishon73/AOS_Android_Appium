@@ -17,20 +17,45 @@ public class AOSAndroidAppiumTest {
     private AndroidDriver driver = null;
     private static boolean noProblem = true;
     private enum LOG_LEVEL {INFO, ERROR};
+    private enum LAB_TYPE {SRF, MC}
+
+    /*
+     *
+     * Need to:
+     *   1. Add proxy handling
+     *   2. Add support for MC execution
+     *
+     */
+
 
     @Before
     public void setup(){
+
         /* Global vars for setup */
-        String MC_SERVER = "";          // Your MC server
-        String MC_SERVER_USER = "";     // Your MC user name
-        String MC_SERVER_PASSWORD = ""; // Your MC password
-        final String SRF_SERVER = System.getenv("SELENIUM_ADDRESS");
-        final String SRF_CLIENT_SECRET  = System.getenv("SRF_CLIENT_SECRET");
-        final String SRF_CLIENT_ID = System.getenv("SRF_CLIENT_ID");
+        boolean hasProxy = false;
+        LAB_TYPE lab_type = LAB_TYPE.SRF;
+        String MC_SERVER = "";                          // Your MC server
+        String MC_SERVER_USER = "";                     // Your MC user name
+        String MC_SERVER_PASSWORD = "";                 // Your MC password
+
+        String SRF_SERVER = (System.getenv("SELENIUM_ADDRESS") != null) ? System.getenv("SELENIUM_ADDRESS") : "https://ftaas.saas.hpe.com";
+        /*
+        SRF client ID:
+        When running Cloud execution, no need to provide it. But when running remote execution, you need
+        */
+        String SRF_CLIENT_ID = (System.getenv("SRF_CLIENT_ID") != null) ? System.getenv("SRF_CLIENT_ID") :
+                "<REPLACE WITH SRF CLIENT ID>";
+        /*
+        SRF client secret:
+        When running Cloud execution, no need to provide it. But when running remote execution, you need
+        */
+        String SRF_CLIENT_SECRET  = (System.getenv("SRF_CLIENT_SECRET") != null) ? System.getenv("SRF_CLIENT_SECRET") :
+                "<REPLACE WITH SRF CLIENT SECRET>";
 
         String APP_PACKAGE = "com.Advantage.aShopping";
         String APP_ACTIVITY = "com.Advantage.aShopping.SplashActivity";
 
+        SRF_SERVER = SRF_SERVER + "/wd/hub";
 
         try {
             // Set Capabilities instance
@@ -46,13 +71,15 @@ public class AOSAndroidAppiumTest {
             capabilities.setCapability("appPackage", APP_PACKAGE);
             capabilities.setCapability("appActivity", APP_ACTIVITY);
 
+            if (lab_type == LAB_TYPE.SRF) {   // SRF execution - Cloud or remote
+                logMessages("================== Using \"" + SRF_SERVER + "\" SRF server ==================", LOG_LEVEL.INFO);
+                logMessages("Client Id: " + SRF_CLIENT_ID, LOG_LEVEL.INFO);
+                logMessages("Client Secret: " + SRF_CLIENT_SECRET, LOG_LEVEL.INFO);
 
-            if (SRF_SERVER != null) {
-                logMessages("================== " + SRF_SERVER + " ==================", LOG_LEVEL.INFO);
                 capabilities.setCapability("SRF_CLIENT_SECRET", SRF_CLIENT_SECRET);
                 capabilities.setCapability("SRF_CLIENT_ID", SRF_CLIENT_ID);
                 driver = new AndroidDriver(new URL(SRF_SERVER), capabilities);
-            } else {
+            } else {       // Remote execution against Mobile Server
                 // Set MC Server credentials (could be skipped if "Anonymous access" is enabled for Appium scripts in the Administration settings).
                 capabilities.setCapability("userName", MC_SERVER_USER);
                 capabilities.setCapability("password", MC_SERVER_PASSWORD);
