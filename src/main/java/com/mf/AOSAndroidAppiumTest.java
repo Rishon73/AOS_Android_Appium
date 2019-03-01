@@ -6,7 +6,10 @@ import org.junit.Test;
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 import java.net.URL;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebElement;
 import io.appium.java_client.android.AndroidDriver;
@@ -18,12 +21,13 @@ public class AOSAndroidAppiumTest {
     private static boolean noProblem = true;
     private enum LOG_LEVEL {INFO, ERROR};
     private enum LAB_TYPE {SRF, MC}
+    LAB_TYPE lab_type;
+    WebDriverWait waitController;
 
     /*
      *
      * Need to:
      *   1. Add proxy handling
-     *   2. Add support for MC execution
      *
      */
 
@@ -33,25 +37,29 @@ public class AOSAndroidAppiumTest {
 
         /* Global vars for setup */
         boolean hasProxy = false;
-        LAB_TYPE lab_type = LAB_TYPE.SRF;
-        String MC_SERVER = "";                          // Your MC server
-        String MC_SERVER_USER = "";                     // Your MC user name
-        String MC_SERVER_PASSWORD = "";                 // Your MC password
+        lab_type = LAB_TYPE.MC; // works with LAB_TYPE.SRF as well
+        String MC_SERVER = "http://nimbusserver.aos.com:8084";                          // Your MC server
+        String MC_SERVER_USER = "admin@default.com";                     // Your MC user name
+        String MC_SERVER_PASSWORD = "Password1";                 // Your MC password
 
-        String SRF_SERVER = (System.getenv("SELENIUM_ADDRESS") != null) ? System.getenv("SELENIUM_ADDRESS") : "https://ftaas.saas.hpe.com";
+        String SRF_SERVER = (System.getenv("SELENIUM_ADDRESS") != null) ? System.getenv("SELENIUM_ADDRESS") : "https://ftaas.saas.microfocus.com";
         /*
         SRF client ID:
         When running Cloud execution, no need to provide it. But when running remote execution, you need
         */
         String SRF_CLIENT_ID = (System.getenv("SRF_CLIENT_ID") != null) ? System.getenv("SRF_CLIENT_ID") :
-                "<REPLACE WITH SRF CLIENT ID>";
+                "XXXXXXXXXXXXXXXXXXXX"; // "<REPLACE WITH SRF CLIENT ID>";
         /*
         SRF client secret:
         When running Cloud execution, no need to provide it. But when running remote execution, you need
         */
         String SRF_CLIENT_SECRET  = (System.getenv("SRF_CLIENT_SECRET") != null) ? System.getenv("SRF_CLIENT_SECRET") :
-                "<REPLACE WITH SRF CLIENT SECRET>";
+                "XXXXXXXXXXXXXXXXXXXX"; // "<REPLACE WITH SRF CLIENT SECRET>";
 
+        /*
+        String APP_PACKAGE = "com.Advantage.aShopping";
+        String APP_ACTIVITY = "com.Advantage.aShopping.SplashActivity";
+        */
         String APP_PACKAGE = "com.Advantage.aShopping";
         String APP_ACTIVITY = "com.Advantage.aShopping.SplashActivity";
 
@@ -63,9 +71,8 @@ public class AOSAndroidAppiumTest {
 
             // Set device capabilities
             capabilities.setCapability("platformName", "Android");
-            //capabilities.setCapability("deviceName", "Nexus 7");
             //capabilities.setCapability("deviceName", "Pixel");
-            //capabilities.setCapability("platformVersion", ">6.0.0");
+            capabilities.setCapability("platformVersion", ">6.0.0");
 
             // Application capabilities
             capabilities.setCapability("appPackage", APP_PACKAGE);
@@ -90,7 +97,7 @@ public class AOSAndroidAppiumTest {
                 driver = new AndroidDriver(new URL(MC_SERVER + "/wd/hub"), capabilities);
             }
             // Create a wait object instance in order to verify expected conditions.
-            WebDriverWait waitController = new WebDriverWait(driver, 60);
+            waitController = new WebDriverWait(driver, 60);
 
             // Create an implicitly wait instance to define the timeout for 'findElement' commands
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -110,9 +117,9 @@ public class AOSAndroidAppiumTest {
     public void runTest() {
         if (!noProblem) return;
         try {
+            WebElement element;
             logMessages("Device in use: " + driver.getCapabilities().getCapability("deviceName").toString() +
                     ", version: " + driver.getCapabilities().getCapability("platformVersion").toString(), LOG_LEVEL.INFO);
-            WebElement element;
 
             logMessages("Open menu", LOG_LEVEL.INFO);
             element = driver.findElementById("com.Advantage.aShopping:id/imageViewMenu");
