@@ -41,6 +41,8 @@ public class AOSAndroidAppiumTest {
         String MC_SERVER = "http://nimbusserver.aos.com:8084";                          // Your MC server
         String MC_SERVER_USER = "admin@default.com";                     // Your MC user name
         String MC_SERVER_PASSWORD = "Password1";                 // Your MC password
+        String AOS_USER_NAME = "";
+        String AOS_PASSWORD = "";
 
         String SRF_SERVER = (System.getenv("SELENIUM_ADDRESS") != null) ? System.getenv("SELENIUM_ADDRESS") : "https://ftaas.saas.microfocus.com";
         /*
@@ -133,14 +135,14 @@ public class AOSAndroidAppiumTest {
             element = driver.findElementByXPath("//android.widget.LinearLayout[1]/android.widget.FrameLayout[1]/" +
                     "android.widget.LinearLayout[1]/android.widget.FrameLayout[1]/android.widget.RelativeLayout[1]/" +
                     "android.widget.LinearLayout[2]/android.widget.RelativeLayout[3]/android.widget.EditText[1]");
-            element.sendKeys("Shahar");
+            element.sendKeys(AOS_USER_NAME);
 
             logMessages("Set password", LOG_LEVEL.INFO);
             element = driver.findElementByXPath("//android.widget.LinearLayout[1]/android.widget.FrameLayout[1]/" +
                     "android.widget.LinearLayout[1]/android.widget.FrameLayout[1]/android.widget.RelativeLayout[1]/" +
                     "android.widget.LinearLayout[2]/android.widget.RelativeLayout[4]/android.widget.EditText[1]");
             element.click();
-            element.sendKeys("Password1");
+            element.sendKeys(AOS_PASSWORD);
 
             logMessages("Sign in...", LOG_LEVEL.INFO);
             element = driver.findElementById("com.Advantage.aShopping:id/buttonLogin");
